@@ -1,0 +1,98 @@
+// Example SWaP-C Analysis for a LTA UAV in Clafer
+// See https://www.clafer.org/
+
+// Features considered for this analysis need to have 
+// annotations for SWaP-C
+abstract SwapcFeature
+    weight -> integer
+    power -> integer
+    price -> integer
+
+
+abstract LtaUav
+    // xor means that only one gets selected
+    // so, choose a type of hull
+    xor hull
+        // partBalloon leaks quicker--add to feature model? 
+        partyBalloon: SwapcFeature
+            [weight = -50]
+            [power = 0]
+            [price = 1]
+        // e.g., something on amazon
+        cheapHull: SwapcFeature
+            [weight = -75]
+            [power = 0]
+            [price = 20]
+        // e.g., an expensive hobbyist hull
+        niceHull: SwapcFeature
+            [weight = -110]
+            [power = 0]
+            [price = 50]
+    // the chassis and airframe
+    frame: SwapcFeature
+        [weight = 25]
+        [power = 0]
+        [price = 15]
+    // main control board (e.g., a Pixhawk)
+    mainBoard: SwapcFeature
+        [weight = 5]
+        [power = 5]
+        [price = 65]
+    // motor + propeller assembly
+    // you can consider this also negative weight because
+    // propulsion (but NOT neutral bouyancy)
+    motorAssembly: SwapcFeature 3..5
+        [weight = 15]
+        [power = 8]
+        [price = 25]
+    // we can add application possibilites as a feature
+    // note the or, meaning we can have more than one
+    or payload
+        visionModule
+            camera: SwapcFeature
+                [weight = 4]
+                [power = 1]
+                [price = 30]
+            visionBoard: SwapcFeature
+                [weight = 7]
+                [power = 5]
+                [price = 40]
+        advertisement
+            led: SwapcFeature
+                [weight = 1]
+                [power = 2]
+                [price = 5]
+        autonomy
+            camera: SwapcFeature
+                [weight = 4]
+                [power = 1]
+                [price = 30]
+            lidar: SwapcFeature
+                [weight = 10]
+                [power = 10]
+                [price = 80]
+            autopilot: SwapcFeature
+                [weight = 7]
+                [power = 25]
+                [price = 70]
+    battery: SwapcFeature 1..3
+        [weight = 25]
+        // maybe make this negative?
+        [power = 0]
+        [price = 15]
+    totalWeight -> integer = sum SwapcFeature.weight
+    totalPower -> integer = sum SwapcFeature.power
+
+exampleUav: LtaUav
+    // additional constraints
+    // neutral bouyancy is a must
+    [totalWeight <= 0]
+    // spend less than 40 watts
+    [totalPower <= 40]
+    // require at least vision or autonomy
+    [visionModule || autonomy]
+    // TODO: we can do stuff life specify duration
+    // by taking the battery watt hours against the totalPower
+
+// minimize weight in this case
+<<minimize exampleUav.totalWeight>>
