@@ -2,7 +2,7 @@
 
 Example SWaP-C (Size, Weight, Power, and Cost) analysis in the Clafer modeling language.
 
-![LTA UAV example](./img/uav.cvl.dot.png)
+![LTA UAV example](./img/ltauav.png)
 
 ## Usage
 
